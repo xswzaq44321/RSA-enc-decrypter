@@ -101,8 +101,6 @@ void MainWindow::on_pushButton_enc_clicked()
 		strcpy(key, keyStr.c_str());
 		char* encrypted = new char[size];
 		int enc_len;
-		qDebug() << (char*)key;
-		qDebug() << keyStr.length();
 		if(ui->radioButton_enc_pub->isChecked()){
 			enc_len = public_encrypt((unsigned char*)data, data_len, (unsigned char*)key, (unsigned char*)encrypted);
 		}else if(ui->radioButton_enc_pri->isChecked()){
