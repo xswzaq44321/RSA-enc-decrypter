@@ -126,14 +126,14 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="QTextEdit" name="textEdit_to_enc">
+           <widget class="QPlainTextEdit" name="plainTextEdit_to_enc">
             <property name="placeholderText">
              <string>Text to Encrypt</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QTextEdit" name="textEdit_enc_key">
+           <widget class="QPlainTextEdit" name="plainTextEdit_enc_key">
             <property name="placeholderText">
              <string>Public/Private Key</string>
             </property>
@@ -220,14 +220,14 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
-           <widget class="QTextEdit" name="textEdit_to_dec">
+           <widget class="QPlainTextEdit" name="plainTextEdit_to_dec">
             <property name="placeholderText">
              <string>Text to Decrypt</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QTextEdit" name="textEdit_dec_key">
+           <widget class="QPlainTextEdit" name="plainTextEdit_dec_key">
             <property name="placeholderText">
              <string>Public/Private Key</string>
             </property>

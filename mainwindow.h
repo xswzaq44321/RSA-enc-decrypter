@@ -45,7 +45,7 @@ private:
 
 	Rsa *myRsa = nullptr;
 	int padding = RSA_PKCS1_PADDING;
-	const int size = 4098;
+	const int BuffSize = 4098;
 };
 
 #endif // MAINWINDOW_H

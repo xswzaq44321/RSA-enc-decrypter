@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+using byte = unsigned char;
+
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
@@ -35,7 +37,7 @@ RSA* MainWindow::createRSA(unsigned char * key,int pub)
 		return nullptr;
 	}
 
-	free(keybio);
+	BIO_free_all(keybio);
 	return rsa;
 }
 
@@ -45,7 +47,7 @@ int MainWindow::public_encrypt(unsigned char * data,int data_len,unsigned char *
 	if(rsa == nullptr)
 		return -2;
 	int result = RSA_public_encrypt(data_len,data,encrypted,rsa,padding);
-	free(rsa);
+	RSA_free(rsa);
 	return result;
 }
 
@@ -55,7 +57,7 @@ int MainWindow::private_decrypt(unsigned char * enc_data,int data_len,unsigned c
 	if(rsa == nullptr)
 		return -2;
 	int  result = RSA_private_decrypt(data_len,enc_data,decrypted,rsa,padding);
-	free(rsa);
+	RSA_free(rsa);
 	return result;
 }
 
@@ -65,7 +67,7 @@ int MainWindow::private_encrypt(unsigned char * data,int data_len,unsigned char 
 	if(rsa == nullptr)
 		return -2;
 	int result = RSA_private_encrypt(data_len,data,encrypted,rsa,padding);
-	free(rsa);
+	RSA_free(rsa);
 	return result;
 }
 
@@ -75,7 +77,7 @@ int MainWindow::public_decrypt(unsigned char * enc_data,int data_len,unsigned ch
 	if(rsa == nullptr)
 		return -2;
 	int  result = RSA_public_decrypt(data_len,enc_data,decrypted,rsa,padding);
-	free(rsa);
+	RSA_free(rsa);
 	return result;
 }
 
@@ -90,21 +92,22 @@ void MainWindow::on_pushButton_generate_clicked()
 
 void MainWindow::on_pushButton_enc_clicked()
 {
-	if(ui->textEdit_to_enc->toPlainText() != "" &&
-			ui->textEdit_enc_key->toPlainText() != ""){
-		std::string dataStr = ui->textEdit_to_enc->toPlainText().toStdString();
-		std::string keyStr = ui->textEdit_enc_key->toPlainText().toStdString();
-		char* data = new char[dataStr.length() + 1];
-		strcpy(data, dataStr.c_str());
-		int data_len = (int)dataStr.length();
+	if(ui->plainTextEdit_to_enc->toPlainText() != "" &&
+			ui->plainTextEdit_enc_key->toPlainText() != ""){
+		std::wstring dataStr = ui->plainTextEdit_to_enc->toPlainText().toStdWString();
+		std::string keyStr = ui->plainTextEdit_enc_key->toPlainText().toStdString();
+		int data_len = (int)dataStr.length()*sizeof(decltype(dataStr)::value_type);
+		byte* data = new byte[data_len];
+		memcpy(data, dataStr.data(), data_len);
+//		strcpy(data, dataStr.c_str());
 		char* key = new char[keyStr.length() + 1];
 		strcpy(key, keyStr.c_str());
-		char* encrypted = new char[size];
+		byte* encrypted = new byte[BuffSize];
 		int enc_len;
 		if(ui->radioButton_enc_pub->isChecked()){
-			enc_len = public_encrypt((unsigned char*)data, data_len, (unsigned char*)key, (unsigned char*)encrypted);
+			enc_len = public_encrypt(data, data_len, (unsigned char*)key, encrypted);
 		}else if(ui->radioButton_enc_pri->isChecked()){
-			enc_len = private_encrypt((unsigned char*)data, data_len, (unsigned char*)key, (unsigned char*)encrypted);
+			enc_len = private_encrypt(data, data_len, (unsigned char*)key, encrypted);
 		}else{
 			return;
 		}
@@ -121,7 +124,7 @@ void MainWindow::on_pushButton_enc_clicked()
 			box.exec();
 			return;
 		}
-		QByteArray byteArrEnc(QByteArray::fromRawData(encrypted, enc_len).toBase64());
+		QByteArray byteArrEnc(QByteArray::fromRawData((char*)encrypted, enc_len).toBase64());
 		ui->textBrowser_enc_res->setPlainText(QString(byteArrEnc));
 		delete[] data;
 		delete[] key;
@@ -131,22 +134,22 @@ void MainWindow::on_pushButton_enc_clicked()
 
 void MainWindow::on_pushButton_dec_clicked()
 {
-	if(ui->textEdit_to_dec->toPlainText() != "" &&
-			ui->textEdit_dec_key->toPlainText() != ""){
-		QByteArray dataByteArr = QByteArray::fromBase64(ui->textEdit_to_dec->toPlainText().toLocal8Bit());
-		std::string keyStr = ui->textEdit_dec_key->toPlainText().toStdString();
-		char* data = new char[dataByteArr.length() + 1];
-		data[dataByteArr.length()] = '\0';
-		memcpy(data, dataByteArr.data(), dataByteArr.length());
+	if(ui->plainTextEdit_to_dec->toPlainText() != "" &&
+			ui->plainTextEdit_dec_key->toPlainText() != ""){
+		QByteArray dataByteArr = QByteArray::fromBase64(ui->plainTextEdit_to_dec->toPlainText().toLocal8Bit());
+		std::string keyStr = ui->plainTextEdit_dec_key->toPlainText().toStdString();
 		int data_len = dataByteArr.length();
+		byte* data = new byte[data_len];
+//		data[dataByteArr.length()] = '\0';
+		memcpy(data, dataByteArr.data(), dataByteArr.length());
 		char* key = new char[keyStr.length() + 1];
 		key = strcpy(key, keyStr.c_str());
-		char* decrypted = new char[size];
+		byte* decrypted = new byte[BuffSize];
 		int dec_len;
 		if(ui->radioButton_dec_pub->isChecked()){
-			dec_len = public_decrypt((unsigned char*)data, data_len, (unsigned char*)key, (unsigned char*)decrypted);
+			dec_len = public_decrypt(data, data_len, (unsigned char*)key, decrypted);
 		}else if(ui->radioButton_dec_pri->isChecked()){
-			dec_len = private_decrypt((unsigned char*)data, data_len, (unsigned char*)key, (unsigned char*)decrypted);
+			dec_len = private_decrypt(data, data_len, (unsigned char*)key, decrypted);
 		}else{
 			return;
 		}
@@ -163,7 +166,7 @@ void MainWindow::on_pushButton_dec_clicked()
 			box.exec();
 			return;
 		}
-		ui->textBrowser_dec_res->setText(QString::fromLocal8Bit((char*)decrypted, dec_len));
+		ui->textBrowser_dec_res->setText(QString::fromWCharArray(reinterpret_cast<wchar_t*>(decrypted), dec_len/sizeof(wchar_t)));
 		delete[] data;
 		delete[] key;
 		delete[] decrypted;

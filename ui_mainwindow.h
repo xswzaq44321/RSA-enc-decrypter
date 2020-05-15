@@ -17,11 +17,11 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
+#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTextBrowser>
-#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -46,8 +46,8 @@ public:
     QLabel *label_4;
     QHBoxLayout *horizontalLayout_4;
     QVBoxLayout *verticalLayout_4;
-    QTextEdit *textEdit_to_enc;
-    QTextEdit *textEdit_enc_key;
+    QPlainTextEdit *plainTextEdit_to_enc;
+    QPlainTextEdit *plainTextEdit_enc_key;
     QHBoxLayout *horizontalLayout_2;
     QLabel *label;
     QRadioButton *radioButton_enc_pub;
@@ -55,8 +55,8 @@ public:
     QPushButton *pushButton_enc;
     QTextBrowser *textBrowser_enc_res;
     QVBoxLayout *verticalLayout_5;
-    QTextEdit *textEdit_to_dec;
-    QTextEdit *textEdit_dec_key;
+    QPlainTextEdit *plainTextEdit_to_dec;
+    QPlainTextEdit *plainTextEdit_dec_key;
     QHBoxLayout *horizontalLayout_3;
     QLabel *label_3;
     QRadioButton *radioButton_dec_pub;
@@ -64,8 +64,8 @@ public:
     QPushButton *pushButton_dec;
     QTextBrowser *textBrowser_dec_res;
     QStatusBar *statusBar;
-    QButtonGroup *buttonGroup;
     QButtonGroup *buttonGroup_2;
+    QButtonGroup *buttonGroup;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -171,15 +171,15 @@ public:
         verticalLayout_4 = new QVBoxLayout();
         verticalLayout_4->setSpacing(6);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
-        textEdit_to_enc = new QTextEdit(centralWidget);
-        textEdit_to_enc->setObjectName(QString::fromUtf8("textEdit_to_enc"));
+        plainTextEdit_to_enc = new QPlainTextEdit(centralWidget);
+        plainTextEdit_to_enc->setObjectName(QString::fromUtf8("plainTextEdit_to_enc"));
 
-        verticalLayout_4->addWidget(textEdit_to_enc);
+        verticalLayout_4->addWidget(plainTextEdit_to_enc);
 
-        textEdit_enc_key = new QTextEdit(centralWidget);
-        textEdit_enc_key->setObjectName(QString::fromUtf8("textEdit_enc_key"));
+        plainTextEdit_enc_key = new QPlainTextEdit(centralWidget);
+        plainTextEdit_enc_key->setObjectName(QString::fromUtf8("plainTextEdit_enc_key"));
 
-        verticalLayout_4->addWidget(textEdit_enc_key);
+        verticalLayout_4->addWidget(plainTextEdit_enc_key);
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(6);
@@ -211,6 +211,7 @@ public:
         buttonGroup->addButton(radioButton_enc_pri);
         radioButton_enc_pri->setObjectName(QString::fromUtf8("radioButton_enc_pri"));
         radioButton_enc_pri->setFont(font3);
+        radioButton_enc_pri->setChecked(false);
 
         horizontalLayout_2->addWidget(radioButton_enc_pri);
 
@@ -234,15 +235,15 @@ public:
         verticalLayout_5 = new QVBoxLayout();
         verticalLayout_5->setSpacing(6);
         verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
-        textEdit_to_dec = new QTextEdit(centralWidget);
-        textEdit_to_dec->setObjectName(QString::fromUtf8("textEdit_to_dec"));
+        plainTextEdit_to_dec = new QPlainTextEdit(centralWidget);
+        plainTextEdit_to_dec->setObjectName(QString::fromUtf8("plainTextEdit_to_dec"));
 
-        verticalLayout_5->addWidget(textEdit_to_dec);
+        verticalLayout_5->addWidget(plainTextEdit_to_dec);
 
-        textEdit_dec_key = new QTextEdit(centralWidget);
-        textEdit_dec_key->setObjectName(QString::fromUtf8("textEdit_dec_key"));
+        plainTextEdit_dec_key = new QPlainTextEdit(centralWidget);
+        plainTextEdit_dec_key->setObjectName(QString::fromUtf8("plainTextEdit_dec_key"));
 
-        verticalLayout_5->addWidget(textEdit_dec_key);
+        verticalLayout_5->addWidget(plainTextEdit_dec_key);
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setSpacing(6);
@@ -311,15 +312,15 @@ public:
         label_2->setText(QCoreApplication::translate("MainWindow", "Public Key", nullptr));
         label_private->setText(QCoreApplication::translate("MainWindow", "Private Key", nullptr));
         label_4->setText(QCoreApplication::translate("MainWindow", "Encryption and Decryption", nullptr));
-        textEdit_to_enc->setPlaceholderText(QCoreApplication::translate("MainWindow", "Text to Encrypt", nullptr));
-        textEdit_enc_key->setPlaceholderText(QCoreApplication::translate("MainWindow", "Public/Private Key", nullptr));
+        plainTextEdit_to_enc->setPlaceholderText(QCoreApplication::translate("MainWindow", "Text to Encrypt", nullptr));
+        plainTextEdit_enc_key->setPlaceholderText(QCoreApplication::translate("MainWindow", "Public/Private Key", nullptr));
         label->setText(QCoreApplication::translate("MainWindow", "RSA Key Type", nullptr));
         radioButton_enc_pub->setText(QCoreApplication::translate("MainWindow", "Public Key", nullptr));
         radioButton_enc_pri->setText(QCoreApplication::translate("MainWindow", "Private Key", nullptr));
         pushButton_enc->setText(QCoreApplication::translate("MainWindow", "Encrypt", nullptr));
         textBrowser_enc_res->setPlaceholderText(QCoreApplication::translate("MainWindow", "Result", nullptr));
-        textEdit_to_dec->setPlaceholderText(QCoreApplication::translate("MainWindow", "Text to Decrypt", nullptr));
-        textEdit_dec_key->setPlaceholderText(QCoreApplication::translate("MainWindow", "Public/Private Key", nullptr));
+        plainTextEdit_to_dec->setPlaceholderText(QCoreApplication::translate("MainWindow", "Text to Decrypt", nullptr));
+        plainTextEdit_dec_key->setPlaceholderText(QCoreApplication::translate("MainWindow", "Public/Private Key", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "RSA Key Type", nullptr));
         radioButton_dec_pub->setText(QCoreApplication::translate("MainWindow", "Public Key", nullptr));
         radioButton_dec_pri->setText(QCoreApplication::translate("MainWindow", "Private Key", nullptr));
