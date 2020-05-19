@@ -23,17 +23,17 @@ RSA* MainWindow::createRSA(unsigned char * key,int pub)
 	BIO *keybio = nullptr;
 	keybio = BIO_new_mem_buf(key, -1);
 	if (keybio==NULL){
-		printf( "Failed to create key BIO");
+		// Failed to create key BIO
 		return nullptr;
 	}
 	if(pub){
-		rsa = PEM_read_bio_RSAPublicKey(keybio, &rsa,NULL, NULL);
+		rsa = PEM_read_bio_RSA_PUBKEY(keybio, &rsa,NULL, NULL);
 	}
 	else{
 		rsa = PEM_read_bio_RSAPrivateKey(keybio, &rsa,NULL, NULL);
 	}
 	if(rsa == NULL){
-		printf( "Failed to create RSA");
+		// Failed to create RSA
 		return nullptr;
 	}
 
@@ -41,41 +41,45 @@ RSA* MainWindow::createRSA(unsigned char * key,int pub)
 	return rsa;
 }
 
-int MainWindow::public_encrypt(unsigned char * data,int data_len,unsigned char * key, unsigned char *encrypted)
+int MainWindow::public_encrypt(unsigned char * data,int data_len,unsigned char * key, unsigned char *&encrypted)
 {
 	RSA *rsa = createRSA(key,1);
 	if(rsa == nullptr)
 		return -2;
+	encrypted = new byte[RSA_size(rsa)];
 	int result = RSA_public_encrypt(data_len,data,encrypted,rsa,padding);
 	RSA_free(rsa);
 	return result;
 }
 
-int MainWindow::private_decrypt(unsigned char * enc_data,int data_len,unsigned char * key, unsigned char *decrypted)
+int MainWindow::private_decrypt(unsigned char * enc_data,int data_len,unsigned char * key, unsigned char *&decrypted)
 {
 	RSA *rsa = createRSA(key,0);
 	if(rsa == nullptr)
 		return -2;
+	decrypted = new byte[RSA_size(rsa)];
 	int  result = RSA_private_decrypt(data_len,enc_data,decrypted,rsa,padding);
 	RSA_free(rsa);
 	return result;
 }
 
-int MainWindow::private_encrypt(unsigned char * data,int data_len,unsigned char * key, unsigned char *encrypted)
+int MainWindow::private_encrypt(unsigned char * data,int data_len,unsigned char * key, unsigned char *&encrypted)
 {
 	RSA *rsa = createRSA(key,0);
 	if(rsa == nullptr)
 		return -2;
+	encrypted = new byte[RSA_size(rsa)];
 	int result = RSA_private_encrypt(data_len,data,encrypted,rsa,padding);
 	RSA_free(rsa);
 	return result;
 }
 
-int MainWindow::public_decrypt(unsigned char * enc_data,int data_len,unsigned char * key, unsigned char *decrypted)
+int MainWindow::public_decrypt(unsigned char * enc_data,int data_len,unsigned char * key, unsigned char *&decrypted)
 {
 	RSA *rsa = createRSA(key,1);
 	if(rsa == nullptr)
 		return -2;
+	decrypted = new byte[RSA_size(rsa)];
 	int  result = RSA_public_decrypt(data_len,enc_data,decrypted,rsa,padding);
 	RSA_free(rsa);
 	return result;
@@ -84,7 +88,8 @@ int MainWindow::public_decrypt(unsigned char * enc_data,int data_len,unsigned ch
 void MainWindow::on_pushButton_generate_clicked()
 {
 	delete myRsa;
-	myRsa = new Rsa();
+	int bits = ui->comboBox->currentText().toInt();
+	myRsa = new Rsa(bits);
 
 	ui->textBrowser_public->setText(myRsa->getPublicKey());
 	ui->textBrowser_private->setText(myRsa->getPrivateKey());
@@ -96,13 +101,12 @@ void MainWindow::on_pushButton_enc_clicked()
 			ui->plainTextEdit_enc_key->toPlainText() != ""){
 		std::wstring dataStr = ui->plainTextEdit_to_enc->toPlainText().toStdWString();
 		std::string keyStr = ui->plainTextEdit_enc_key->toPlainText().toStdString();
-		int data_len = (int)dataStr.length()*sizeof(decltype(dataStr)::value_type);
+		int data_len = (int)dataStr.length()*sizeof(wchar_t);
 		byte* data = new byte[data_len];
 		memcpy(data, dataStr.data(), data_len);
-//		strcpy(data, dataStr.c_str());
 		char* key = new char[keyStr.length() + 1];
 		strcpy(key, keyStr.c_str());
-		byte* encrypted = new byte[BuffSize];
+		byte* encrypted = nullptr;
 		int enc_len;
 		if(ui->radioButton_enc_pub->isChecked()){
 			enc_len = public_encrypt(data, data_len, (unsigned char*)key, encrypted);
@@ -113,13 +117,20 @@ void MainWindow::on_pushButton_enc_clicked()
 		}
 		if(enc_len == -2){
 			QMessageBox box;
-			box.setText("Invalid Public/Private Key Format!");
+			if(ui->radioButton_enc_pub->isChecked()){
+				box.setText("Invalid Public Key Format!");
+			}else {
+				box.setText("Invalid Private Key Format!");
+			}
 			box.setStandardButtons(QMessageBox::Ok);
 			box.exec();
 			return;
 		}else if(enc_len == -1){
+			char msg[256];
+			ERR_error_string(ERR_get_error(), msg);
 			QMessageBox box;
-			box.setText("Failed to Encrypt!");
+			box.setWindowTitle("Failed to Encrypt!");
+			box.setText(QString::fromLocal8Bit(msg));
 			box.setStandardButtons(QMessageBox::Ok);
 			box.exec();
 			return;
@@ -140,11 +151,10 @@ void MainWindow::on_pushButton_dec_clicked()
 		std::string keyStr = ui->plainTextEdit_dec_key->toPlainText().toStdString();
 		int data_len = dataByteArr.length();
 		byte* data = new byte[data_len];
-//		data[dataByteArr.length()] = '\0';
 		memcpy(data, dataByteArr.data(), dataByteArr.length());
 		char* key = new char[keyStr.length() + 1];
 		key = strcpy(key, keyStr.c_str());
-		byte* decrypted = new byte[BuffSize];
+		byte* decrypted{};
 		int dec_len;
 		if(ui->radioButton_dec_pub->isChecked()){
 			dec_len = public_decrypt(data, data_len, (unsigned char*)key, decrypted);
@@ -155,13 +165,20 @@ void MainWindow::on_pushButton_dec_clicked()
 		}
 		if(dec_len == -2){
 			QMessageBox box;
-			box.setText("Invalid Public/Private Key Format!");
+			if(ui->radioButton_dec_pub->isChecked()){
+				box.setText("Invalid Public Key Format!");
+			}else {
+				box.setText("Invalid Private Key Format!");
+			}
 			box.setStandardButtons(QMessageBox::Ok);
 			box.exec();
 			return;
 		}else if(dec_len == -1){
+			char msg[256];
+			ERR_error_string(ERR_get_error(), msg);
 			QMessageBox box;
-			box.setText("Failed to Decrypt!");
+			box.setWindowTitle("Failed to Decrypt!");
+			box.setText(QString::fromLocal8Bit(msg));
 			box.setStandardButtons(QMessageBox::Ok);
 			box.exec();
 			return;

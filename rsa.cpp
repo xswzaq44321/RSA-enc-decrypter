@@ -1,6 +1,7 @@
 #include "rsa.h"
 
-Rsa::Rsa()
+Rsa::Rsa(int bits):
+	kBits(bits)
 {
 	rsa = RSA_generate_key(kBits, kExp, 0, 0);
 
@@ -8,7 +9,7 @@ Rsa::Rsa()
 	BIO *bio_pri = BIO_new(BIO_s_mem());
 	BIO *bio_pub = BIO_new(BIO_s_mem());
 	PEM_write_bio_RSAPrivateKey(bio_pri, rsa, NULL, NULL, 0, NULL, NULL);
-	PEM_write_bio_RSAPublicKey(bio_pub, rsa);
+	PEM_write_bio_RSA_PUBKEY(bio_pub, rsa);
 
 	keylen_pri = BIO_pending(bio_pri);
 	keylen_pub = BIO_pending(bio_pub);

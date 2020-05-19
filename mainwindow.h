@@ -31,10 +31,10 @@ public:
 	~MainWindow();
 
 	RSA* createRSA(unsigned char * key,int pub);
-	int public_encrypt(unsigned char* data,int data_len,unsigned char* key, unsigned char* encrypted);
-	int private_decrypt(unsigned char* enc_data,int data_len,unsigned char* key, unsigned char* decrypted);
-	int private_encrypt(unsigned char* data,int data_len,unsigned char* key, unsigned char* encrypted);
-	int public_decrypt(unsigned char* enc_data,int data_len,unsigned char* key, unsigned char* decrypted);
+	int public_encrypt(unsigned char* data,int data_len,unsigned char* key, unsigned char* &encrypted);
+	int private_decrypt(unsigned char* enc_data,int data_len,unsigned char* key, unsigned char* &decrypted);
+	int private_encrypt(unsigned char* data,int data_len,unsigned char* key, unsigned char* &encrypted);
+	int public_decrypt(unsigned char* enc_data,int data_len,unsigned char* key, unsigned char* &decrypted);
 private slots:
 	void on_pushButton_generate_clicked();
 	void on_pushButton_enc_clicked();
@@ -45,7 +45,6 @@ private:
 
 	Rsa *myRsa = nullptr;
 	int padding = RSA_PKCS1_PADDING;
-	const int BuffSize = 4098;
 };
 
 #endif // MAINWINDOW_H

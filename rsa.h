@@ -10,7 +10,7 @@
 class Rsa
 {
 public:
-	Rsa();
+	Rsa(int bits = 2048);
 	~Rsa();
 
 	void generateRsa();
@@ -19,7 +19,7 @@ public:
 	int privateKeyLen();
 	int publicKeyLen();
 private:
-	const int kBits = 2048;
+	const int kBits;
 	const int kExp = 3;
 	RSA *rsa = nullptr;
 	int keylen_pri, keylen_pub;
